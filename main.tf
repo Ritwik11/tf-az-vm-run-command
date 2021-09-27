@@ -1,8 +1,8 @@
 locals {
-  settings_windows = {
+  /*settings_windows = {
     script   = "${compact(concat(list(var.command), split("\n", var.script)))}"
     fileUris = "${var.file_uris}"
-  }
+  }*/
 
   settings_linux = {
     commandToExecute = "${var.command}"
@@ -11,11 +11,11 @@ locals {
   }
 }
 
-data "azurerm_resource_group" "main" {
+data "azurerm_resource_group" "MyRg" {
   name = "${var.resource_group_name}"
 }
 
-data "azurerm_virtual_machine" "main" {
+data "azurerm_virtual_machine" "myterraformvm" {
   name                = "${var.virtual_machine_name}"
   resource_group_name = "${data.azurerm_resource_group.main.name}"
 }
@@ -23,9 +23,9 @@ data "azurerm_virtual_machine" "main" {
 resource "azurerm_virtual_machine_extension" "linux" {
   count                      = "${lower(var.os_type) == "linux" ? 1 : 0}"
   name                       = "${var.virtual_machine_name}-run-command"
-  location                   = "${data.azurerm_resource_group.main.location}"
-  resource_group_name        = "${data.azurerm_resource_group.main.name}"
-  virtual_machine_name       = "${data.azurerm_virtual_machine.main.name}"
+  location                   = "${data.azurerm_resource_group.MyRg.location}"
+  resource_group_name        = "${data.azurerm_resource_group.MyRg.name}"
+  virtual_machine_name       = "${data.azurerm_virtual_machine.myterraformvm.name}"
   publisher                  = "Microsoft.CPlat.Core"
   type                       = "RunCommandLinux"
   type_handler_version       = "1.0"
@@ -34,7 +34,7 @@ resource "azurerm_virtual_machine_extension" "linux" {
   tags                       = "${var.tags}"
 }
 
-resource "azurerm_virtual_machine_extension" "windows" {
+/*resource "azurerm_virtual_machine_extension" "windows" {
   count                      = "${lower(var.os_type) == "windows" ? 1 : 0}"
   name                       = "${var.virtual_machine_name}-run-command"
   location                   = "${data.azurerm_resource_group.main.location}"
@@ -46,4 +46,4 @@ resource "azurerm_virtual_machine_extension" "windows" {
   auto_upgrade_minor_version = true
   settings                   = "${jsonencode(local.settings_windows)}"
   tags                       = "${var.tags}"
-}
+}*/
